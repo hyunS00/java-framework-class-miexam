@@ -1,49 +1,32 @@
 package kr.ac.jejunu.user;
 
-import javax.sql.DataSource;
 import java.sql.*;
 
 public class UserDao {
     private final JdbcContext jdbcContext;
-
     public UserDao(JdbcContext jdbcContext) {
         this.jdbcContext = jdbcContext;
     }
     public User findById(Long id) throws SQLException {
-        StatementStrategy statementStrategy = connection -> {
-            PreparedStatement preparedStatement = connection.prepareStatement("select id, name, password from userinfo where id = ?");
-            preparedStatement.setLong(1, id);
-            return preparedStatement;
-        };
-        User user = jdbcContext.jdbcContextForFindById(statementStrategy);
+        String sql = "select id, name, password from userinfo where id = ?";
+        Object[] params = new Object[]{id};
+        User user = jdbcContext.findById(sql, params);
         return user;
     }
     public void insert(User user) throws SQLException {
-        StatementStrategy statementStrategy = connection -> {
-            PreparedStatement preparedStatement = connection.prepareStatement("insert into userinfo (name,password) values (?,?)", Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, user.getName());
-            preparedStatement.setString(2, user.getPassword());
-            return preparedStatement;
-        };
-        jdbcContext.jdbcContextForInsert(user, statementStrategy);
+        String sql = "insert into userinfo (name,password) values (?,?)";
+        Object[] params = new Object[]{user.getName(),user.getPassword()};
+        jdbcContext.insert(user, sql, params, this);
     }
     public void update(User user) {
-        StatementStrategy statementStrategy = connection -> {
-            PreparedStatement preparedStatement = connection.prepareStatement("update userinfo set name=?,password=? where id=?");
-            preparedStatement.setString(1, user.getName());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setLong(3, user.getId());
-            return preparedStatement;
-        };
-        jdbcContext.jdbcCOntextForUpdate(statementStrategy);
+        String sql = "update userinfo set name=?,password=? where id=?";
+        Object[] params = new Object[]{user.getName(),user.getPassword(),user.getId()};
+        jdbcContext.update(sql, params);
     }
 
     public void delete(Long id) {
-        StatementStrategy statementStrategy = connection -> {
-            PreparedStatement preparedStatement =connection.prepareStatement("delete from userinfo where id=?");
-            preparedStatement.setLong(1, id);
-            return preparedStatement;
-        };
-        jdbcContext.jdbcCOntextForUpdate(statementStrategy);
+        String sql = "delete from userinfo where id=?";
+        Object[] params = new Object[]{id};
+        jdbcContext.update(sql, params);
     }
 }
