@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public interface StatementStrategy {
 
-    public PreparedStatement getPreparedStatement(Object object, Connection connection) throws SQLException;
+    public PreparedStatement getPreparedStatement(Connection connection) throws SQLException;
 
 //        PreparedStatement preparedStatement;
 //        preparedStatement = connection.prepareStatement("delete from userinfo where id=?");
